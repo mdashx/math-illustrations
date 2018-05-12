@@ -1,0 +1,212 @@
+% Exercise 1.10. Draw in PostScript the following pictures, taken, with
+% modifications, from the proof of Proposition I.47 in the standard
+% edition of Euclid’s Elements. Of course you might want to look up
+% Euclid’s argument first. One thing to keep in mind is that in drawing
+% a complex figure, each conceptual component in the program should be
+% handled as a unit. A triangle is not just a bunch of line segments,
+% but line segments assembled in a particular order and style. You
+% should also think here about about using colors in an intelligent way
+% to help explain Euclid’s proof.
+
+% https://mathcs.clarku.edu/~djoyce/elements/bookI/propI47.html
+
+% I'd like to actually do this by using compass and ruler methods in
+% PostScript, but for the sake of getting the exercise done in a way
+% that follows the book, I'm going to calculate coordinates for now.
+
+% I'm not completely following the book though, because I need to use
+% some variables and procedures, otherwise it's just too much of a mess.
+
+% My plan is to first calculate all of the points in the drawing, and
+% then use them to draw the various paths I need 9 coordinates total,
+% 3 for the triangle and then two more for each square.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FINDING POINT PROCEDURES
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/getVector {
+    4 dict begin
+    
+    /p1 exch def
+    /p2 exch def
+
+    /vectorx {p1 0 get p2 0 get sub} def
+    /vectory {p1 1 get p2 1 get sub} def
+
+    [vectorx vectory]
+    
+    end
+} def
+
+/getLength {
+    3 dict begin
+    
+    /p1 exch def
+    /p2 exch def
+
+    /thisVector { p2 p1 getVector } def
+    thisVector { dup mul } forall add sqrt
+    end
+} def
+
+/getUnitVector {
+    % Given two points, returns a normalized vector.
+    5 dict begin
+    
+    /p1 exch def
+    /p2 exch def
+
+    /magnitude { p2 p1 getLength} def
+
+    /thisVector { p2 p1 getVector } def
+    
+    /normalx {
+        thisVector 0 get magnitude div }
+    def
+
+    /normaly {
+        thisVector 1 get magnitude div }
+    def
+
+    [normalx normaly]
+    end
+} def
+
+/pointFromVector {
+    % Find a point along a line from another point, given a unit
+    % vector and a distance.
+
+    % Takes a point, a vector and a length from the stack, and returns
+    % a new point to the stack.
+
+    5 dict begin
+    /p exch def
+    /vector exch def
+    /length exch def
+
+    % [p0 + (v0 * length), p1 + (v1 * length)]
+    /p0 { p 0 get vector 0 get length mul add } def
+    /p1 { p 1 get vector 1 get length mul add } def
+
+    [p0 p1]
+    end
+} def
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% DRAWING PROCEDURES
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/connectPoints {
+    2 dict begin
+    /startpt exch def % get starting point
+    /pts exch def % get the rest of the points
+
+    startpt aload pop moveto
+    pts { aload pop lineto } forall
+    end
+} def
+
+/closedPathFromPoints {
+    connectPoints
+    closepath
+} def 
+
+/pathFromPoints {
+    connectPoints
+} def
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% CALCULATE THE POINTS
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Triangle: (-1, 0), (3, 0), (0, sqrt 3)
+/sqrt3 {3 sqrt} def
+/left [-1 0] def
+/right [3 0] def
+/top [0 sqrt3] def
+
+% Left square
+/leftLength { left top getLength } def  % Left side of triangle
+/topvector { right top getUnitVector } def  % Normalized vector of hypotenuse
+/leftSquareTop { leftLength topvector top pointFromVector } def % length, vector, start
+/leftSquareBottom { leftLength topvector left pointFromVector } def % length, vector, start
+
+% Right Square
+/rightLength { top right getLength } def % Length of hypotenuse
+/leftVector { left top getUnitVector } def % Unit vector from left side of triangle
+/rightSquareTop { rightLength leftVector top pointFromVector } def
+/rightSquareBottom { rightLength leftVector right pointFromVector } def
+
+% Bottom Square
+/bottomLength { right left getLength} def % Length of bottom of triangle
+/verticalVector { [0 0] [0 -1] getUnitVector } def % Vector going straight down
+/bottomSquareLeft { bottomLength verticalVector left pointFromVector } def
+/bottomSquareRight{ bottomLength verticalVector right pointFromVector } def
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% CREATE THE DRAWING
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Setup page
+72 dup scale
+1 72 div setlinewidth
+4.25 5.5 translate
+.25 dup scale % make units 1/4 inch
+
+/theTriangle { % Construct triangle out of two 30-60-90 triangles with a height of sqrt 3
+    gsave
+    newpath [right top] left closedPathFromPoints stroke
+    grestore
+} def
+
+/leftSquare { % Draw the left square
+    gsave
+    newpath [leftSquareTop leftSquareBottom left] top closedPathFromPoints stroke
+    grestore
+} def
+
+/rightSquare { % Draw the right square
+    gsave
+    newpath [rightSquareTop rightSquareBottom right] top closedPathFromPoints stroke
+    grestore
+} def
+
+/bottomSquare { % Draw the bottom square
+    gsave
+    newpath [bottomSquareLeft bottomSquareRight right] left closedPathFromPoints stroke
+    grestore
+} def
+
+theTriangle
+leftSquare
+rightSquare
+bottomSquare
+
+% newpath
+% top 0 get top 1 get moveto
+% nextpoint aload pop lineto
+% stroke
+
+% /Times-Roman findfont
+% 1 72 div 10 mul scalefont
+% setfont
+
+% % Let ABC be a right-angled triangle having the angle BAC right
+
+% newpath
+% -4.25 5.5 translate
+% .5 -.5 moveto
+% (Let ABC be a right-angled triangle having the angle BAC right) show

@@ -1,0 +1,55 @@
+%!
+
+% Exercise 1.2. Run Ghostscript. Draw an equilateral triangle near the
+% center of the page, instead of a square. Make it 100 points on a
+% side, with one side horizontal. First draw it in outline, then fill
+% it in black. Next, make it in turn red, green, and blue with a black
+% outline. (You will have to do a few calculations first. In fact, as
+% we shall see later, you can get PostScript to do the calculations.)
+
+% -------
+
+% First calculate the points starting at the origin (currently the
+% bottom left corner of the page)
+
+% left corners: (0,0) - (0, 100)
+% top corner will be: (p, 50)
+
+% 50^2 + p^2 = 100^2
+
+% >>> math.sqrt(7500)
+% 86.60254037844386
+
+% (0,0) (86.60254037844386, 50) (0, 100)
+
+% The page is 612 points tall, so I'll move my points up 250 points to
+% get close enough to the center
+
+% And 792 pts wide, so +300 points on the x-axis
+
+% (300, 250) (386.60254037844386, 300) (300, 350)
+
+% -----------
+
+% If I were using PostScript functions, maybe I could use rlineto?
+
+newpath
+300 450 moveto
+386.60254037844386 500 lineto
+300 550 lineto
+closepath
+stroke
+
+0.0 1.0 0.0 setrgbcolor
+newpath
+300 450 moveto
+386.60254037844386 500 lineto
+300 550 lineto
+closepath
+fill
+
+
+
+
+
+

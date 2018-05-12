@@ -1,0 +1,56 @@
+%!
+
+% Exercise 1.3. How would you scale to centimeters?
+
+% Convert points -> inches -> centimeters (1 inch = 2.54 cm)
+
+% http://pages.cs.wisc.edu/~rjl/landscape/
+% << /PageSize [595 842] >> setpagedevice
+
+% ---
+
+% Exercise 1.4. Europeans use A4 paper. Find out its dimensions, and
+% show how to draw a square one centimeter on a side with center in
+% the middle of an A4 page. (Incidentally, what is the special
+% mathematical property of A4 paper?)
+
+% (Incidentally, what is the special mathematical property of A4
+% paper?) - aspect ratio is 1:sqrt(2)
+
+% Dimensions: 210x297mm or 21cm x 29.7
+
+% center of page 10.5 cm x 14.85 cm
+% 10 14.35
+
+<< /PageSize [595 842] >> setpagedevice
+
+% scale to cm
+72 dup scale
+1 2.54 div dup scale
+
+% set line width
+0.01 setlinewidth
+
+% move origin to center of page
+10.5 14.85 translate
+
+% draw square
+newpath
+-.5 -.5 moveto
+1 0 rlineto
+0 1 rlineto
+-1 0 rlineto
+closepath
+fill
+
+% checking out rotation
+45 rotate
+
+newpath
+-.5 -.5 moveto
+1 0 rlineto
+0 1 rlineto
+-1 0 rlineto
+closepath
+fill
+
