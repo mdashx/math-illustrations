@@ -1,0 +1,73 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FINDING POINT PROCEDURES
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/getVector {
+    4 dict begin
+    
+    /p1 exch def
+    /p2 exch def
+
+    /vectorx {p1 0 get p2 0 get sub} def
+    /vectory {p1 1 get p2 1 get sub} def
+
+    [vectorx vectory]
+    
+    end
+} def
+
+/getLength {
+    3 dict begin
+    
+    /p1 exch def
+    /p2 exch def
+
+    /thisVector { p2 p1 getVector } def
+    thisVector { dup mul } forall add sqrt
+    end
+} def
+
+/getUnitVector {
+    % Given two points, returns a normalized vector.
+    5 dict begin
+    
+    /p1 exch def
+    /p2 exch def
+
+    /magnitude { p2 p1 getLength} def
+
+    /thisVector { p2 p1 getVector } def
+    
+    /normalx {
+        thisVector 0 get magnitude div }
+    def
+
+    /normaly {
+        thisVector 1 get magnitude div }
+    def
+
+    [normalx normaly]
+    end
+} def
+
+/pointFromVector {
+    % Find a point along a line from another point, given a unit
+    % vector and a distance.
+
+    % Takes a point, a vector and a length from the stack, and returns
+    % a new point to the stack.
+
+    5 dict begin
+    /p exch def
+    /vector exch def
+    /length exch def
+
+    % [p0 + (v0 * length), p1 + (v1 * length)]
+    /p0 { p 0 get vector 0 get length mul add } def
+    /p1 { p 1 get vector 1 get length mul add } def
+
+    [p0 p1]
+    end
+} def

@@ -1,0 +1,84 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% DRAWING PROCEDURES
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/connectPoints {
+    2 dict begin
+    /startpt exch def % get starting point
+    /pts exch def % get the rest of the points
+
+    startpt aload pop moveto
+    pts { aload pop lineto } forall
+    end
+} def
+
+/closedPathFromPoints {
+    connectPoints
+    closepath
+} def 
+
+/pathFromPoints {
+    connectPoints
+} def
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% TEXT PROCEDURES
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/normalText {
+    newpath
+    /Times-Roman findfont
+    1 72 div 10 mul scalefont
+    setfont
+} def
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% TWO COLUMN LAYOUT
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/leftCol { % Assumes 8.5 x 11 page size
+    1 dict begin
+    /ystart exch def % This is the top of the row
+    % /height exch def % Height of the row
+
+    % 0 ystart moveto
+    8.5 2 div 2 div % middle of column
+    % height 2 div neg ystart add % middle of row
+    ystart
+    translate
+    end
+
+    % find middle of left column
+    % find middle of left row
+    % translate zero to that position
+} def
+
+/rightColText {
+    % Putting text here so Y zero is all the way to the left
+    % This assumes that leftCol has previously traslated to the Y coordinate for the row
+
+    8.5 2 div % half the page (left justified 0)
+    8.5 2 div 2 div
+    add
+    % height 2 div neg ystart add % middle of row
+    0
+    translate
+} def
+
+/resetX {
+    8.5 2 div neg 0 translate
+} def

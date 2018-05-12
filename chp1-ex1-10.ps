@@ -1,3 +1,8 @@
+% Dependencies
+%
+% cat page-setup.ps vector-procedures.ps drawing-procedures.ps chp1-ex1-10.ps > tmp.ps
+% (or use the Makefile: `make ex10`)
+
 % Exercise 1.10. Draw in PostScript the following pictures, taken, with
 % modifications, from the proof of Proposition I.47 in the standard
 % edition of Euclid’s Elements. Of course you might want to look up
@@ -20,107 +25,6 @@
 % My plan is to first calculate all of the points in the drawing, and
 % then use them to draw the various paths I need 9 coordinates total,
 % 3 for the triangle and then two more for each square.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FINDING POINT PROCEDURES
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-/getVector {
-    4 dict begin
-    
-    /p1 exch def
-    /p2 exch def
-
-    /vectorx {p1 0 get p2 0 get sub} def
-    /vectory {p1 1 get p2 1 get sub} def
-
-    [vectorx vectory]
-    
-    end
-} def
-
-/getLength {
-    3 dict begin
-    
-    /p1 exch def
-    /p2 exch def
-
-    /thisVector { p2 p1 getVector } def
-    thisVector { dup mul } forall add sqrt
-    end
-} def
-
-/getUnitVector {
-    % Given two points, returns a normalized vector.
-    5 dict begin
-    
-    /p1 exch def
-    /p2 exch def
-
-    /magnitude { p2 p1 getLength} def
-
-    /thisVector { p2 p1 getVector } def
-    
-    /normalx {
-        thisVector 0 get magnitude div }
-    def
-
-    /normaly {
-        thisVector 1 get magnitude div }
-    def
-
-    [normalx normaly]
-    end
-} def
-
-/pointFromVector {
-    % Find a point along a line from another point, given a unit
-    % vector and a distance.
-
-    % Takes a point, a vector and a length from the stack, and returns
-    % a new point to the stack.
-
-    5 dict begin
-    /p exch def
-    /vector exch def
-    /length exch def
-
-    % [p0 + (v0 * length), p1 + (v1 * length)]
-    /p0 { p 0 get vector 0 get length mul add } def
-    /p1 { p 1 get vector 1 get length mul add } def
-
-    [p0 p1]
-    end
-} def
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% DRAWING PROCEDURES
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-/connectPoints {
-    2 dict begin
-    /startpt exch def % get starting point
-    /pts exch def % get the rest of the points
-
-    startpt aload pop moveto
-    pts { aload pop lineto } forall
-    end
-} def
-
-/closedPathFromPoints {
-    connectPoints
-    closepath
-} def 
-
-/pathFromPoints {
-    connectPoints
-} def
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,49 +64,124 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Setup page
-72 dup scale
-1 72 div setlinewidth
-4.25 5.5 translate
-.25 dup scale % make units 1/4 inch
-
 /theTriangle { % Construct triangle out of two 30-60-90 triangles with a height of sqrt 3
     gsave
+    drawSmaller
     newpath [right top] left closedPathFromPoints stroke
     grestore
 } def
 
 /leftSquare { % Draw the left square
     gsave
+    drawSmaller
     newpath [leftSquareTop leftSquareBottom left] top closedPathFromPoints stroke
     grestore
 } def
 
 /rightSquare { % Draw the right square
     gsave
+    drawSmaller
     newpath [rightSquareTop rightSquareBottom right] top closedPathFromPoints stroke
     grestore
 } def
 
 /bottomSquare { % Draw the bottom square
     gsave
+    drawSmaller
     newpath [bottomSquareLeft bottomSquareRight right] left closedPathFromPoints stroke
     grestore
 } def
 
-theTriangle
-leftSquare
-rightSquare
-bottomSquare
+/theSquares {
+    leftSquare rightSquare bottomSquare
+} def
+
+/step1 {
+    -1 leftCol
+    gsave
+    theTriangle
+    grestore
+    resetX
+    rightColText
+    gsave
+    normalText
+    0 0 moveto
+    (Let ABC be a right-angled triangle having the angle BAC right) show
+    grestore
+    resetX
+
+} def
+
+
+/step2 {
+    -1.5 leftCol
+    gsave
+    theTriangle
+    theSquares
+    grestore
+    resetX
+    rightColText
+    gsave
+    normalText
+    0 0 moveto
+    (Let ABC be a right-angled triangle having the angle BAC right) show
+    grestore
+    
+    resetX
+} def
+
+/step3 {
+    -2.2 leftCol
+    gsave
+    theTriangle
+    theSquares
+    grestore
+    resetX
+    rightColText
+    gsave
+    normalText
+    0 0 moveto
+    (Let ABC be a right-angled triangle having the angle BAC right) show
+    grestore
+
+    resetX
+    
+} def
+
+% /drawStep {
+    
+%     cvx
+%     exec
+% }
+
+% Setup page
+eightByElevenCenteredOneInchGrid
+startAtTopLeft
+
+% [//step1 //step2 //step3] {
+%     gsave cvx exec grestore
+% } forall
+
+step1
+step2 step3
+
+% gsave
+% step1
+% grestore
+
+% gsave
+% step2
+% grestore
+
+% gsave
+% step3
+% grestore
+
 
 % newpath
 % top 0 get top 1 get moveto
 % nextpoint aload pop lineto
 % stroke
-
-% /Times-Roman findfont
-% 1 72 div 10 mul scalefont
-% setfont
 
 % % Let ABC be a right-angled triangle having the angle BAC right
 

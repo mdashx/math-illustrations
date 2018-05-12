@@ -1,0 +1,16 @@
+/eightByElevenCenteredOneInchGrid {
+    72 dup scale % scale to one ince
+    1 72 div setlinewidth % keep linewidth at one point
+    4.25 5.5 translate % center on 8 1/2 by 11 page
+} def
+
+/startAtTopLeft {
+    -4.25 5.5 translate
+} def
+
+/drawSmaller {
+    .20 dup scale % make units 1/4 inch
+    3 72 div setlinewidth % keep linewidth at one point
+} def
+
+
