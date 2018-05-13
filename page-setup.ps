@@ -9,8 +9,13 @@
 } def
 
 /drawSmaller {
-    .20 dup scale % make units 1/4 inch
-    3 72 div setlinewidth % keep linewidth at one point
+    .40 dup scale % make units 1/4 inch
+    1 72 div setlinewidth
+    1 setlinejoin
+} def
+
+/drawThicker {
+    3 72 div setlinewidth
 } def
 
 

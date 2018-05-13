@@ -57,6 +57,11 @@
 /bottomSquareLeft { bottomLength verticalVector left pointFromVector } def
 /bottomSquareRight{ bottomLength verticalVector right pointFromVector } def
 
+% Parallel
+/parallelLength { sqrt3 bottomLength add } def
+/parallelBottom { parallelLength verticalVector top pointFromVector } def
+/parallelTop { sqrt3 verticalVector top pointFromVector } def
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -72,120 +77,89 @@
 } def
 
 /leftSquare { % Draw the left square
-    gsave
-    drawSmaller
-    newpath [leftSquareTop leftSquareBottom left] top closedPathFromPoints stroke
-    grestore
+    newpath [leftSquareTop leftSquareBottom left] top closedPathFromPoints
 } def
 
 /rightSquare { % Draw the right square
-    gsave
-    drawSmaller
-    newpath [rightSquareTop rightSquareBottom right] top closedPathFromPoints stroke
-    grestore
+    newpath [rightSquareTop rightSquareBottom right] top closedPathFromPoints
 } def
 
 /bottomSquare { % Draw the bottom square
-    gsave
-    drawSmaller
-    newpath [bottomSquareLeft bottomSquareRight right] left closedPathFromPoints stroke
-    grestore
+    newpath [bottomSquareLeft bottomSquareRight right] left closedPathFromPoints
 } def
 
 /theSquares {
-    leftSquare rightSquare bottomSquare
+    gsave
+    drawSmaller
+    leftSquare stroke
+    rightSquare stroke
+    bottomSquare stroke
+    grestore
 } def
 
-/step1 {
-    -1 leftCol
+/theParallel {
     gsave
-    theTriangle
+    drawSmaller
+    [parallelBottom] top pathFromPoints stroke
     grestore
-    resetX
-    rightColText
-    gsave
-    normalText
-    0 0 moveto
-    (Let ABC be a right-angled triangle having the angle BAC right) show
-    grestore
-    resetX
-
 } def
 
+/theParallelogramTriangles {
+    gsave
+    drawSmaller
+    drawThicker
+    newpath
 
-/step2 {
-    -1.5 leftCol
-    gsave
-    theTriangle
-    theSquares
+    /firstColor 255 80 80 convertHexColor def
+    firstColor aload pop setrgbcolor
+    
+    [left bottomSquareLeft] top closedPathFromPoints stroke
+    [leftSquareBottom left] right closedPathFromPoints stroke
+
+    /secondColor 51 153 255 convertHexColor def
+    
+    secondColor aload pop setrgbcolor
+
+    [rightSquareBottom left] right closedPathFromPoints stroke
+    [bottomSquareRight top] right closedPathFromPoints stroke
+
+    
     grestore
-    resetX
-    rightColText
+} def
+
+/fillParallelograms {
     gsave
-    normalText
-    0 0 moveto
-    (Let ABC be a right-angled triangle having the angle BAC right) show
+    drawSmaller
+    newpath
+    /leftFill 255 153 153  convertHexColor def
+    leftFill aload pop setrgbcolor
+    
+    [parallelTop parallelBottom bottomSquareLeft] left closedPathFromPoints fill
+    [parallelTop parallelBottom bottomSquareLeft] left closedPathFromPoints stroke
+
+    leftSquare fill
+    leftSquare stroke
+
+    /rightFill 153 204 255 convertHexColor def
+    rightFill aload pop setrgbcolor
+
+    [parallelTop parallelBottom bottomSquareRight] right closedPathFromPoints fill
+    [parallelTop parallelBottom bottomSquareRight] right closedPathFromPoints stroke
+
+    rightSquare fill
+    rightSquare stroke
+    
     grestore
     
-    resetX
 } def
-
-/step3 {
-    -2.2 leftCol
-    gsave
-    theTriangle
-    theSquares
-    grestore
-    resetX
-    rightColText
-    gsave
-    normalText
-    0 0 moveto
-    (Let ABC be a right-angled triangle having the angle BAC right) show
-    grestore
-
-    resetX
-    
-} def
-
-% /drawStep {
-    
-%     cvx
-%     exec
-% }
 
 % Setup page
 eightByElevenCenteredOneInchGrid
-startAtTopLeft
 
-% [//step1 //step2 //step3] {
-%     gsave cvx exec grestore
-% } forall
+% Draw the diagram
+theTriangle
+theSquares
+theParallel
+fillParallelograms
+theParallelogramTriangles
 
-step1
-step2 step3
-
-% gsave
-% step1
-% grestore
-
-% gsave
-% step2
-% grestore
-
-% gsave
-% step3
-% grestore
-
-
-% newpath
-% top 0 get top 1 get moveto
-% nextpoint aload pop lineto
-% stroke
-
-% % Let ABC be a right-angled triangle having the angle BAC right
-
-% newpath
-% -4.25 5.5 translate
-% .5 -.5 moveto
-% (Let ABC be a right-angled triangle having the angle BAC right) show

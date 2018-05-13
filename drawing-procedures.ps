@@ -23,6 +23,14 @@
     connectPoints
 } def
 
+/convertHexColor {
+    /blue exch def
+    /green exch def
+    /red exch def
+
+    [red 255.0 div green 255.0 div blue 255.0 div]
+} def
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -36,11 +44,6 @@
     1 72 div 10 mul scalefont
     setfont
 } def
-
-
-
-
-
 
 
 
