@@ -1,0 +1,353 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%BoundingBox: 227.317 280.8 442.283 5341
+
+100 dict begin
+
+/eightByElevenCenteredOneInchGrid {
+    72 dup scale % scale to one ince
+    1 72 div setlinewidth % keep linewidth at one point
+
+    4.25 5.5 translate % center on 8 1/2 by 11 page
+} def
+
+/startAtTopLeft {
+    -4.25 5.5 translate
+} def
+
+/drawSmaller {
+    .40 dup scale
+    1 72 div setlinewidth
+    1 setlinejoin
+} def
+
+/drawThicker {
+    3 72 div setlinewidth
+} def
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FINDING POINT PROCEDURES
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/getVector {
+    4 dict begin
+    
+    /p1 exch def
+    /p2 exch def
+
+    /vectorx {p1 0 get p2 0 get sub} def
+    /vectory {p1 1 get p2 1 get sub} def
+
+    [vectorx vectory]
+    
+    end
+} def
+
+/getLength {
+    3 dict begin
+    
+    /p1 exch def
+    /p2 exch def
+
+    /thisVector { p2 p1 getVector } def
+    thisVector { dup mul } forall add sqrt
+    end
+} def
+
+/getUnitVector {
+    % Given two points, returns a normalized vector.
+    5 dict begin
+    
+    /p1 exch def
+    /p2 exch def
+
+    /magnitude { p2 p1 getLength} def
+
+    /thisVector { p2 p1 getVector } def
+    
+    /normalx {
+        thisVector 0 get magnitude div }
+    def
+
+    /normaly {
+        thisVector 1 get magnitude div }
+    def
+
+    [normalx normaly]
+    end
+} def
+
+/pointFromVector {
+    % Find a point along a line from another point, given a unit
+    % vector and a distance.
+
+    % Takes a point, a vector and a length from the stack, and returns
+    % a new point to the stack.
+
+    5 dict begin
+    /p exch def
+    /vector exch def
+    /length exch def
+
+    % [p0 + (v0 * length), p1 + (v1 * length)]
+    /p0 { p 0 get vector 0 get length mul add } def
+    /p1 { p 1 get vector 1 get length mul add } def
+
+    [p0 p1]
+    end
+} def
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% DRAWING PROCEDURES
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/connectPoints {
+    2 dict begin
+    /startpt exch def % get starting point
+    /pts exch def % get the rest of the points
+
+    startpt aload pop moveto
+    pts { aload pop lineto } forall
+    end
+} def
+
+/closedPathFromPoints {
+    connectPoints
+    closepath
+} def 
+
+/pathFromPoints {
+    connectPoints
+} def
+
+/convertHexColor {
+    /blue exch def
+    /green exch def
+    /red exch def
+
+    [red 255.0 div green 255.0 div blue 255.0 div]
+} def
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% TEXT PROCEDURES
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/normalText {
+    newpath
+    /Times-Roman findfont
+    1 72 div 10 mul scalefont
+    setfont
+} def
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% TWO COLUMN LAYOUT
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/leftCol { % Assumes 8.5 x 11 page size
+    1 dict begin
+    /ystart exch def % This is the top of the row
+    % /height exch def % Height of the row
+
+    % 0 ystart moveto
+    8.5 2 div 2 div % middle of column
+    % height 2 div neg ystart add % middle of row
+    ystart
+    translate
+    end
+
+    % find middle of left column
+    % find middle of left row
+    % translate zero to that position
+} def
+
+/rightColText {
+    % Putting text here so Y zero is all the way to the left
+    % This assumes that leftCol has previously traslated to the Y coordinate for the row
+
+    8.5 2 div % half the page (left justified 0)
+    8.5 2 div 2 div
+    add
+    % height 2 div neg ystart add % middle of row
+    0
+    translate
+} def
+
+/resetX {
+    8.5 2 div neg 0 translate
+} def
+% Dependencies
+%
+% cat page-setup.ps vector-procedures.ps drawing-procedures.ps chp1-ex1-10.ps > tmp.ps
+% (or use the Makefile: `make ex10`)
+
+% Exercise 1.10. Draw in PostScript the following pictures, taken, with
+% modifications, from the proof of Proposition I.47 in the standard
+% edition of Euclid’s Elements. Of course you might want to look up
+% Euclid’s argument first. One thing to keep in mind is that in drawing
+% a complex figure, each conceptual component in the program should be
+% handled as a unit. A triangle is not just a bunch of line segments,
+% but line segments assembled in a particular order and style. You
+% should also think here about about using colors in an intelligent way
+% to help explain Euclid’s proof.
+
+% https://mathcs.clarku.edu/~djoyce/elements/bookI/propI47.html
+
+% I'd like to actually do this by using compass and ruler methods in
+% PostScript, but for the sake of getting the exercise done in a way
+% that follows the book, I'm going to calculate coordinates for now.
+
+% I'm not completely following the book though, because I need to use
+% some variables and procedures, otherwise it's just too much of a mess.
+
+% My plan is to first calculate all of the points in the drawing, and
+% then use them to draw the various paths I need 9 coordinates total,
+% 3 for the triangle and then two more for each square.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% CALCULATE THE POINTS
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Triangle: (-1, 0), (3, 0), (0, sqrt 3)
+/sqrt3 {3 sqrt} def
+/left [-1 0] def
+/right [3 0] def
+/top [0 sqrt3] def
+
+% Left square
+/leftLength { left top getLength } def  % Left side of triangle
+/topvector { right top getUnitVector } def  % Normalized vector of hypotenuse
+/leftSquareTop { leftLength topvector top pointFromVector } def % length, vector, start
+/leftSquareBottom { leftLength topvector left pointFromVector } def % length, vector, start
+
+% Right Square
+/rightLength { top right getLength } def % Length of hypotenuse
+/leftVector { left top getUnitVector } def % Unit vector from left side of triangle
+/rightSquareTop { rightLength leftVector top pointFromVector } def
+/rightSquareBottom { rightLength leftVector right pointFromVector } def
+
+% Bottom Square
+/bottomLength { right left getLength} def % Length of bottom of triangle
+/verticalVector { [0 0] [0 -1] getUnitVector } def % Vector going straight down
+/bottomSquareLeft { bottomLength verticalVector left pointFromVector } def
+/bottomSquareRight{ bottomLength verticalVector right pointFromVector } def
+
+% Parallel
+/parallelLength { sqrt3 bottomLength add } def
+/parallelBottom { parallelLength verticalVector top pointFromVector } def
+/parallelTop { sqrt3 verticalVector top pointFromVector } def
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% CREATE THE DRAWING
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/theTriangle { % Construct triangle out of two 30-60-90 triangles with a height of sqrt 3
+    gsave
+    drawSmaller
+    newpath [right top] left closedPathFromPoints stroke
+    grestore
+} def
+
+/leftSquare { % Draw the left square
+    newpath [leftSquareTop leftSquareBottom left] top closedPathFromPoints
+} def
+
+/rightSquare { % Draw the right square
+    newpath [rightSquareTop rightSquareBottom right] top closedPathFromPoints
+} def
+
+/bottomSquare { % Draw the bottom square
+    newpath [bottomSquareLeft bottomSquareRight right] left closedPathFromPoints
+} def
+
+/theSquares {
+    gsave
+    drawSmaller
+    leftSquare stroke
+    rightSquare stroke
+    bottomSquare stroke
+    grestore
+} def
+
+/theParallel {
+    gsave
+    drawSmaller
+    [parallelBottom] top pathFromPoints stroke
+    grestore
+} def
+
+/theParallelogramTriangles {
+    gsave
+    drawSmaller
+    drawThicker
+    newpath
+
+    /firstColor 255 80 80 convertHexColor def
+    firstColor aload pop setrgbcolor
+    
+    [left bottomSquareLeft] top closedPathFromPoints stroke
+    [leftSquareBottom left] right closedPathFromPoints stroke
+
+    /secondColor 51 153 255 convertHexColor def
+    
+    secondColor aload pop setrgbcolor
+
+    [rightSquareBottom left] right closedPathFromPoints stroke
+    [bottomSquareRight top] right closedPathFromPoints stroke
+
+    
+    grestore
+} def
+
+/fillParallelograms {
+    gsave
+    drawSmaller
+    newpath
+    /leftFill 255 153 153  convertHexColor def
+    leftFill aload pop setrgbcolor
+    
+    [parallelTop parallelBottom bottomSquareLeft] left closedPathFromPoints fill
+    [parallelTop parallelBottom bottomSquareLeft] left closedPathFromPoints stroke
+
+    leftSquare fill
+    leftSquare stroke
+
+    /rightFill 153 204 255 convertHexColor def
+    rightFill aload pop setrgbcolor
+
+    [parallelTop parallelBottom bottomSquareRight] right closedPathFromPoints fill
+    [parallelTop parallelBottom bottomSquareRight] right closedPathFromPoints stroke
+
+    rightSquare fill
+    rightSquare stroke
+    
+    grestore
+    
+} def
+
+% Setup page
+eightByElevenCenteredOneInchGrid
+
+% Draw the diagram
+theTriangle
+theSquares
+theParallel
+fillParallelograms
+theParallelogramTriangles
+
+end
